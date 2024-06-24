@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+{% load static %}
+<html>
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="description" content="" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="{% static 'css/home.css' %}">
+    <link rel="shortcut icon" href="{% static 'image/logo2.png' %}" type="image/x-icon">
+    <script src="{% static 'js/session_monitor.js' %}"></script>
+    <title>{{ independi.primer_apellido }}</title>
+  </head>
+  <body>
+    {% if request.session.estadoSesion %}
+      {% if request.session.permisos == 'Contador' or request.session.permisos == 'Auxiliar Contable' or request.session.permisos == 'RRHH' %}
+        <div class="contenedor">
+          <div class="titulo">
+            <img src="{% static 'image/logo2.png' %}" alt="PayMaster">
+            <p>Bienvenido {{ independi.primer_nombre }}</p>
+            <img src="{% static 'image/logo2.png' %}" alt="PayMaster">
+          </div>
+      
+
+          <div class="menu">
+            
+              <a class="opccion" href="{% url 'ListarEmpresa' %}" >Ver Empresas</a>
+            {% if request.session.permisos == 'RRHH' %}     
+              <a class="opccion" href="{% url 'registroEmpleado' %}">Registrar empleado</a>
+            {% endif %}
+            {% if request.session.permisos == 'Contador' or request.session.permisos == 'Auxiliar Contable' %}
+              <a class="opccion" href="{% url 'registroEmpresa' %}">Registrar Empresa</a>
+            {% endif %}
+            <form id="logout-form" method="POST" action="{% url 'cerrar_sesion_redirect_e' %}">
+              {% csrf_token %}
+              <button class="opccion" type="submit">Cerrar Sesion</button>
+            </form>
+          </div>
+        </div>
+      {% else %}
+        <h1>El usuario no tiene permisos</h1>
+        <a class="link" href="{% url 'loginEmpresa' %}">Iniciar sesión</a>
+      {% endif %}
+    {% else %}
+      <h1>El usuario no ha iniciado sesión</h1>
+      <a class="link" href="{% url 'loginEmpresa' %}">Iniciar sesión</a>
+    {% endif %}
+
+  
+  </body>
+</html>

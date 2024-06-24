@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Resultados de Cálculos</title>
+</head>
+<body>
+    <div class="container mt-5">
+        <h2>Resultados de Cálculos para {{ independiente.primer_nombre }} {{ independiente.primer_apellido }}</h2>
+        
+        <table class="table">
+            <thead>
+                <tr>
+                    <th>Concepto</th>
+                    <th>Valor</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Salario Base</td>
+                    <td>{{ salario_base }}</td>
+                </tr>
+                <tr>
+                    <td>IBC</td>
+                    <td>{{ ibc }}</td>
+                </tr>
+                <tr>
+                    <td>Salud</td>
+                    <td>{{ salud }}</td>
+                </tr>
+                <tr>
+                    <td>Pensión</td>
+                    <td>{{ pension }}</td>
+                </tr>
+                <tr>
+                    <td>ARL</td>
+                    <td>{{ arl }}</td>
+                </tr>
+                <tr>
+                    <td>CCF</td>
+                    <td>{{ ccf }}</td>
+                </tr>
+                {% comment %} <tr>
+                    <td>FSP</td>
+                    <td>{{ fsp }}</td>
+                </tr> {% endcomment %}
+            </tbody>
+        </table>
+        
+        <a href="{% url 'homeIndependiente' %}" class="btn btn-primary">Volver</a>
+    </div>
+</body>
+</html>

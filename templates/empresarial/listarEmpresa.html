@@ -1,0 +1,116 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Empresas</title>
+  <link rel="stylesheet" href="{% static 'css/tablas.css' %}">
+  <link rel="shortcut icon" href="{% static 'image/logo2.png' %}" type="image/x-icon">
+  <script src="{% static 'js/session_monitor.js' %}"></script>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+  <script>
+    var idleTime = 0;
+
+    function timerIncrement() {
+      idleTime++;
+      if (idleTime > 1) { // 1 minuto
+        window.location.href = "{% url 'cerrar_sesion_redirect_e' %}";
+      }
+    }
+
+    $(document).ready(function () {
+      // Increment the idle time counter every minute.
+      var idleInterval = setInterval(timerIncrement, 100000); // 1 minuto
+
+      // Reset the idle timer on mouse movement or key press.
+      $(this).mousemove(function (e) {
+        idleTime = 0;
+        keepSessionAlive();
+      });
+      $(this).keypress(function (e) {
+        idleTime = 0;
+        keepSessionAlive();
+      });
+    });
+
+    function keepSessionAlive() {
+      $.get("{% url 'keep_session_alive' %}");
+    }
+        
+    window.addEventListener('popstate', function(event) {
+      // Prevenir el comportamiento por defecto
+      event.preventDefault();
+
+      // Enviar la solicitud POST para cerrar sesión
+      fetch('{% url "cerrar_sesion_redirect_e" %}', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'X-CSRFToken': '{{ csrf_token }}'
+        },
+        body: JSON.stringify({})
+      }).then(response => {
+        if (response.ok) {
+          // Redirigir a la página de inicio de sesión después de cerrar sesión
+          window.location.href = '{% url "loginEmpresa" %}';
+        }
+      }).catch(error => {
+        console.error('Error al cerrar sesión:', error);
+        // Opcional: Manejar errores si es necesario
+      });
+    });
+  </script>
+</head>
+<body>
+  <div class="contenedor">
+    {% if request.session.estadoSesion %}
+      {% if request.session.permisos == 'Contador' or request.session.permisos == 'Auxiliar Contable' or request.session.permisos == 'RRHH' %}
+        <p class="titulo">Lista de Empresas</p>
+        <table>
+          <tr>
+            <th>Nit</th>
+            <th>Razon Social</th>
+            <th>Telefono Entidad</th>
+            <th>Correo Entidad</th>
+            <th>Imagen</th>
+            <th>Accion</th>
+          </tr>
+          {% for empresa in get_empresa %}
+            <tr>
+              <td>{{ empresa.nit }}</td>
+              <td>{{ empresa.razon_social }}</td>
+              <td>{{ empresa.telefono_entidad }}</td>
+              <td>{{ empresa.correo_entidad }}</td>
+              <td>
+                <img src="{{ empresa.imagen.url }}" alt="Imagen" width="50" />
+              </td>
+              {% if request.session.permisos == 'Contador' or request.session.permisos == 'Auxiliar Contable' %}
+              <td>
+                <a class="a" href="{% url 'editarEmpresa' empresa.nit %}">Editar</a>
+                <a class="a" href="{% url 'eliminarempre' empresa.nit %}">Eliminar</a>
+                <a class="a" href="{% url 'ListarEmpleados' empresa.nit %}">Nomina Personal</a>
+              {% endif %}
+              </td>
+              <td>
+              {% if request.session.permisos == 'RRHH' %}
+                <a class="a" href="{% url 'ListarEmpleados' empresa.nit %}">Gestionar Personal</a>
+              {% endif %}
+              </td>
+            </tr>
+          {% endfor %}
+        </table>
+        <div class="volverB">
+          <a class="link" href="{% url 'homeEmpresa' %}">Volver</a>
+        </div>
+      </div>
+    {% else %}
+      <h1>El usuario no tiene permisos</h1>
+      <a class="link" href="{% url 'loginEmpresa' %}">Iniciar sesión</a>
+    {% endif %}
+  {% else %}
+    <h1>El usuario no ha iniciado sesión</h1>
+    <a class="link" href="{% url 'loginEmpresa' %}">Iniciar sesión</a>
+  {% endif %}
+</body>
+</html>
